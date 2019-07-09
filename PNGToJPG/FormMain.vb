@@ -586,6 +586,8 @@ Public Class FormMain
     End Sub
 
     Private Sub CleanUp()
+        m_PreviewImage = Nothing
+
         If (g_ClassScanner IsNot Nothing) Then
             g_ClassScanner.Abort()
             g_ClassScanner = Nothing
