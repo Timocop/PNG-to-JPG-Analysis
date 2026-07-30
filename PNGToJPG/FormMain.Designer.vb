@@ -38,12 +38,6 @@ Partial Class FormMain
         Me.GroupBox3 = New System.Windows.Forms.GroupBox()
         Me.PictureBox_ImagePreview = New System.Windows.Forms.PictureBox()
         Me.SplitContainer1 = New System.Windows.Forms.SplitContainer()
-        Me.ListViewEx_Images = New PNGToJPG.ClassListViewEx()
-        Me.ColumnHeader1 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
-        Me.ColumnHeader2 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
-        Me.ColumnHeader3 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
-        Me.ColumnHeader4 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
-        Me.ColumnHeader5 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         Me.ContextMenuStrip_Images = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.ToolStripMenuItem_Open = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItem_OpenExplorer = New System.Windows.Forms.ToolStripMenuItem()
@@ -53,6 +47,13 @@ Partial Class FormMain
         Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
         Me.ToolStripStatusLabel_Progress = New System.Windows.Forms.ToolStripStatusLabel()
         Me.ToolStripProgressBar_Progress = New System.Windows.Forms.ToolStripProgressBar()
+        Me.CheckBox_CheckSubDirectorys = New System.Windows.Forms.CheckBox()
+        Me.ListViewEx_Images = New PNGToJPG.ClassListViewEx()
+        Me.ColumnHeader2 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
+        Me.ColumnHeader1 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
+        Me.ColumnHeader3 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
+        Me.ColumnHeader4 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
+        Me.ColumnHeader5 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         Me.GroupBox1.SuspendLayout()
         CType(Me.NumericUpDown_Threads, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.NumericUpDown_JpgQuality, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -80,6 +81,7 @@ Partial Class FormMain
         '
         Me.GroupBox1.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.GroupBox1.Controls.Add(Me.CheckBox_CheckSubDirectorys)
         Me.GroupBox1.Controls.Add(Me.NumericUpDown_Threads)
         Me.GroupBox1.Controls.Add(Me.Label2)
         Me.GroupBox1.Controls.Add(Me.NumericUpDown_JpgQuality)
@@ -100,7 +102,7 @@ Partial Class FormMain
         Me.NumericUpDown_Threads.Name = "NumericUpDown_Threads"
         Me.NumericUpDown_Threads.Size = New System.Drawing.Size(66, 22)
         Me.NumericUpDown_Threads.TabIndex = 3
-        Me.NumericUpDown_Threads.Value = New Decimal(New Integer() {95, 0, 0, 0})
+        Me.NumericUpDown_Threads.Value = New Decimal(New Integer() {4, 0, 0, 0})
         '
         'Label2
         '
@@ -108,7 +110,7 @@ Partial Class FormMain
         Me.Label2.AutoSize = True
         Me.Label2.Location = New System.Drawing.Point(527, 49)
         Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(47, 13)
+        Me.Label2.Size = New System.Drawing.Size(48, 13)
         Me.Label2.TabIndex = 2
         Me.Label2.Text = "Threads"
         '
@@ -124,11 +126,12 @@ Partial Class FormMain
         '
         Me.TextBox_Path.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.TextBox_Path.BackColor = System.Drawing.SystemColors.Window
         Me.TextBox_Path.BorderStyle = System.Windows.Forms.BorderStyle.None
         Me.TextBox_Path.Location = New System.Drawing.Point(6, 26)
         Me.TextBox_Path.Name = "TextBox_Path"
         Me.TextBox_Path.ReadOnly = True
-        Me.TextBox_Path.Size = New System.Drawing.Size(611, 15)
+        Me.TextBox_Path.Size = New System.Drawing.Size(518, 15)
         Me.TextBox_Path.TabIndex = 1
         Me.TextBox_Path.Text = "Select directory"
         '
@@ -181,11 +184,84 @@ Partial Class FormMain
         Me.SplitContainer1.SplitterDistance = 464
         Me.SplitContainer1.TabIndex = 4
         '
+        'ContextMenuStrip_Images
+        '
+        Me.ContextMenuStrip_Images.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItem_Open, Me.ToolStripMenuItem_OpenExplorer, Me.ToolStripSeparator1, Me.ToolStripMenuItem_Convert, Me.ToolStripMenuItem_Remove})
+        Me.ContextMenuStrip_Images.Name = "ContextMenuStrip_Images"
+        Me.ContextMenuStrip_Images.Size = New System.Drawing.Size(163, 98)
+        '
+        'ToolStripMenuItem_Open
+        '
+        Me.ToolStripMenuItem_Open.Image = CType(resources.GetObject("ToolStripMenuItem_Open.Image"), System.Drawing.Image)
+        Me.ToolStripMenuItem_Open.Name = "ToolStripMenuItem_Open"
+        Me.ToolStripMenuItem_Open.Size = New System.Drawing.Size(162, 22)
+        Me.ToolStripMenuItem_Open.Text = "Open"
+        '
+        'ToolStripMenuItem_OpenExplorer
+        '
+        Me.ToolStripMenuItem_OpenExplorer.Name = "ToolStripMenuItem_OpenExplorer"
+        Me.ToolStripMenuItem_OpenExplorer.Size = New System.Drawing.Size(162, 22)
+        Me.ToolStripMenuItem_OpenExplorer.Text = "Open in explorer"
+        '
+        'ToolStripSeparator1
+        '
+        Me.ToolStripSeparator1.Name = "ToolStripSeparator1"
+        Me.ToolStripSeparator1.Size = New System.Drawing.Size(159, 6)
+        '
+        'ToolStripMenuItem_Convert
+        '
+        Me.ToolStripMenuItem_Convert.Image = CType(resources.GetObject("ToolStripMenuItem_Convert.Image"), System.Drawing.Image)
+        Me.ToolStripMenuItem_Convert.Name = "ToolStripMenuItem_Convert"
+        Me.ToolStripMenuItem_Convert.Size = New System.Drawing.Size(162, 22)
+        Me.ToolStripMenuItem_Convert.Text = "Convert to JPG"
+        '
+        'ToolStripMenuItem_Remove
+        '
+        Me.ToolStripMenuItem_Remove.Image = CType(resources.GetObject("ToolStripMenuItem_Remove.Image"), System.Drawing.Image)
+        Me.ToolStripMenuItem_Remove.Name = "ToolStripMenuItem_Remove"
+        Me.ToolStripMenuItem_Remove.Size = New System.Drawing.Size(162, 22)
+        Me.ToolStripMenuItem_Remove.Text = "Remove"
+        '
+        'StatusStrip1
+        '
+        Me.StatusStrip1.BackColor = System.Drawing.SystemColors.Control
+        Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripStatusLabel_Progress, Me.ToolStripProgressBar_Progress})
+        Me.StatusStrip1.Location = New System.Drawing.Point(0, 479)
+        Me.StatusStrip1.Name = "StatusStrip1"
+        Me.StatusStrip1.Size = New System.Drawing.Size(739, 22)
+        Me.StatusStrip1.TabIndex = 5
+        Me.StatusStrip1.Text = "StatusStrip1"
+        '
+        'ToolStripStatusLabel_Progress
+        '
+        Me.ToolStripStatusLabel_Progress.Name = "ToolStripStatusLabel_Progress"
+        Me.ToolStripStatusLabel_Progress.Size = New System.Drawing.Size(119, 17)
+        Me.ToolStripStatusLabel_Progress.Text = "ToolStripStatusLabel1"
+        Me.ToolStripStatusLabel_Progress.Visible = False
+        '
+        'ToolStripProgressBar_Progress
+        '
+        Me.ToolStripProgressBar_Progress.Name = "ToolStripProgressBar_Progress"
+        Me.ToolStripProgressBar_Progress.Size = New System.Drawing.Size(100, 16)
+        Me.ToolStripProgressBar_Progress.Visible = False
+        '
+        'CheckBox_CheckSubDirectorys
+        '
+        Me.CheckBox_CheckSubDirectorys.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.CheckBox_CheckSubDirectorys.AutoSize = True
+        Me.CheckBox_CheckSubDirectorys.Location = New System.Drawing.Point(530, 25)
+        Me.CheckBox_CheckSubDirectorys.Name = "CheckBox_CheckSubDirectorys"
+        Me.CheckBox_CheckSubDirectorys.Size = New System.Drawing.Size(87, 17)
+        Me.CheckBox_CheckSubDirectorys.TabIndex = 4
+        Me.CheckBox_CheckSubDirectorys.Text = "Sub Folders"
+        Me.CheckBox_CheckSubDirectorys.UseVisualStyleBackColor = True
+        '
         'ListViewEx_Images
         '
-        Me.ListViewEx_Images.Columns.AddRange(New System.Windows.Forms.ColumnHeader() {Me.ColumnHeader1, Me.ColumnHeader2, Me.ColumnHeader3, Me.ColumnHeader4, Me.ColumnHeader5})
+        Me.ListViewEx_Images.Columns.AddRange(New System.Windows.Forms.ColumnHeader() {Me.ColumnHeader2, Me.ColumnHeader1, Me.ColumnHeader3, Me.ColumnHeader4, Me.ColumnHeader5})
         Me.ListViewEx_Images.ContextMenuStrip = Me.ContextMenuStrip_Images
         Me.ListViewEx_Images.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.ListViewEx_Images.HideSelection = False
         Me.ListViewEx_Images.Location = New System.Drawing.Point(0, 0)
         Me.ListViewEx_Images.m_SetSortingColumn = True
         Me.ListViewEx_Images.Name = "ListViewEx_Images"
@@ -194,15 +270,15 @@ Partial Class FormMain
         Me.ListViewEx_Images.UseCompatibleStateImageBehavior = False
         Me.ListViewEx_Images.View = System.Windows.Forms.View.Details
         '
-        'ColumnHeader1
-        '
-        Me.ColumnHeader1.Text = "Ratio %"
-        Me.ColumnHeader1.Width = 75
-        '
         'ColumnHeader2
         '
         Me.ColumnHeader2.Text = "File"
         Me.ColumnHeader2.Width = 250
+        '
+        'ColumnHeader1
+        '
+        Me.ColumnHeader1.Text = "Ratio %"
+        Me.ColumnHeader1.Width = 75
         '
         'ColumnHeader3
         '
@@ -219,70 +295,11 @@ Partial Class FormMain
         Me.ColumnHeader5.Text = "Quality"
         Me.ColumnHeader5.Width = 50
         '
-        'ContextMenuStrip_Images
-        '
-        Me.ContextMenuStrip_Images.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItem_Open, Me.ToolStripMenuItem_OpenExplorer, Me.ToolStripSeparator1, Me.ToolStripMenuItem_Convert, Me.ToolStripMenuItem_Remove})
-        Me.ContextMenuStrip_Images.Name = "ContextMenuStrip_Images"
-        Me.ContextMenuStrip_Images.Size = New System.Drawing.Size(181, 120)
-        '
-        'ToolStripMenuItem_Open
-        '
-        Me.ToolStripMenuItem_Open.Image = CType(resources.GetObject("ToolStripMenuItem_Open.Image"), System.Drawing.Image)
-        Me.ToolStripMenuItem_Open.Name = "ToolStripMenuItem_Open"
-        Me.ToolStripMenuItem_Open.Size = New System.Drawing.Size(180, 22)
-        Me.ToolStripMenuItem_Open.Text = "Open"
-        '
-        'ToolStripMenuItem_OpenExplorer
-        '
-        Me.ToolStripMenuItem_OpenExplorer.Name = "ToolStripMenuItem_OpenExplorer"
-        Me.ToolStripMenuItem_OpenExplorer.Size = New System.Drawing.Size(180, 22)
-        Me.ToolStripMenuItem_OpenExplorer.Text = "Open in explorer"
-        '
-        'ToolStripSeparator1
-        '
-        Me.ToolStripSeparator1.Name = "ToolStripSeparator1"
-        Me.ToolStripSeparator1.Size = New System.Drawing.Size(177, 6)
-        '
-        'ToolStripMenuItem_Convert
-        '
-        Me.ToolStripMenuItem_Convert.Image = CType(resources.GetObject("ToolStripMenuItem_Convert.Image"), System.Drawing.Image)
-        Me.ToolStripMenuItem_Convert.Name = "ToolStripMenuItem_Convert"
-        Me.ToolStripMenuItem_Convert.Size = New System.Drawing.Size(180, 22)
-        Me.ToolStripMenuItem_Convert.Text = "Convert to JPG"
-        '
-        'ToolStripMenuItem_Remove
-        '
-        Me.ToolStripMenuItem_Remove.Image = CType(resources.GetObject("ToolStripMenuItem_Remove.Image"), System.Drawing.Image)
-        Me.ToolStripMenuItem_Remove.Name = "ToolStripMenuItem_Remove"
-        Me.ToolStripMenuItem_Remove.Size = New System.Drawing.Size(180, 22)
-        Me.ToolStripMenuItem_Remove.Text = "Remove"
-        '
-        'StatusStrip1
-        '
-        Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripStatusLabel_Progress, Me.ToolStripProgressBar_Progress})
-        Me.StatusStrip1.Location = New System.Drawing.Point(0, 479)
-        Me.StatusStrip1.Name = "StatusStrip1"
-        Me.StatusStrip1.Size = New System.Drawing.Size(739, 22)
-        Me.StatusStrip1.TabIndex = 5
-        Me.StatusStrip1.Text = "StatusStrip1"
-        '
-        'ToolStripStatusLabel_Progress
-        '
-        Me.ToolStripStatusLabel_Progress.Name = "ToolStripStatusLabel_Progress"
-        Me.ToolStripStatusLabel_Progress.Size = New System.Drawing.Size(120, 17)
-        Me.ToolStripStatusLabel_Progress.Text = "ToolStripStatusLabel1"
-        Me.ToolStripStatusLabel_Progress.Visible = False
-        '
-        'ToolStripProgressBar_Progress
-        '
-        Me.ToolStripProgressBar_Progress.Name = "ToolStripProgressBar_Progress"
-        Me.ToolStripProgressBar_Progress.Size = New System.Drawing.Size(100, 16)
-        Me.ToolStripProgressBar_Progress.Visible = False
-        '
         'FormMain
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
-        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(96.0!, 96.0!)
+        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
+        Me.BackColor = System.Drawing.SystemColors.Window
         Me.ClientSize = New System.Drawing.Size(739, 501)
         Me.Controls.Add(Me.StatusStrip1)
         Me.Controls.Add(Me.SplitContainer1)
@@ -334,4 +351,5 @@ Partial Class FormMain
     Friend WithEvents ColumnHeader5 As ColumnHeader
     Friend WithEvents NumericUpDown_Threads As NumericUpDown
     Friend WithEvents Label2 As Label
+    Friend WithEvents CheckBox_CheckSubDirectorys As CheckBox
 End Class

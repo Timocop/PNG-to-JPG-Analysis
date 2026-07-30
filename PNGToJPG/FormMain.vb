@@ -34,6 +34,7 @@ Public Class FormMain
         Try
             If (g_ClassScanner Is Nothing OrElse Not g_ClassScanner.m_Scanning) Then
                 Dim sDirectory As String
+                Dim bIncludeSubDirectories As Boolean = CheckBox_CheckSubDirectorys.Checked
                 Dim iQuality As Integer = CInt(NumericUpDown_JpgQuality.Value)
                 Dim iThreads As Integer = CInt(NumericUpDown_Threads.Value)
 
@@ -48,7 +49,7 @@ Public Class FormMain
                     End If
                 End Using
 
-                g_ClassScanner = New ClassScanner(Me, sDirectory, iQuality, iThreads)
+                g_ClassScanner = New ClassScanner(Me, sDirectory, bIncludeSubDirectories, iQuality, iThreads)
                 g_ClassScanner.Start()
             Else
                 g_ClassScanner.Abort()
@@ -244,14 +245,16 @@ Public Class FormMain
         Private g_mScannerThread As Threading.Thread
 
         Property m_Directory As String
+        Property m_IncludeSubDirectories As Boolean
         Property m_Quality As Integer
         Property m_Threads As Integer
 
         Private _lock As New Object
 
-        Public Sub New(_FormMain As FormMain, _Directory As String, _Quality As Integer, _Threads As Integer)
+        Public Sub New(_FormMain As FormMain, _Directory As String, _IncludeSubDirectories As Boolean, _Quality As Integer, _Threads As Integer)
             g_fFormMain = _FormMain
             m_Directory = _Directory
+            m_IncludeSubDirectories = _IncludeSubDirectories
             m_Quality = _Quality
             m_Threads = _Threads
         End Sub
@@ -284,6 +287,7 @@ Public Class FormMain
         Private Sub ScannerThread()
             Try
                 Dim sDirectory As String = m_Directory
+                Dim bIncludeSubDirectories As Boolean = m_IncludeSubDirectories
                 Dim iQuality As Integer = m_Quality
                 Dim iThreads As Integer = m_Threads
 
@@ -297,7 +301,7 @@ Public Class FormMain
                 g_fFormMain.BeginInvoke(Sub() g_fFormMain.ToolStripStatusLabel_Progress.Visible = True)
                 g_fFormMain.BeginInvoke(Sub() g_fFormMain.ToolStripProgressBar_Progress.Visible = True)
 
-                Dim sFiles = IO.Directory.GetFiles(sDirectory, "*.*", IO.SearchOption.TopDirectoryOnly)
+                Dim sFiles = IO.Directory.GetFiles(sDirectory, "*.*", If(bIncludeSubDirectories, IO.SearchOption.AllDirectories, IO.SearchOption.TopDirectoryOnly))
                 Dim mPngInfo As New List(Of STRUC_IMAGE_INFO)
                 Dim mThreads As New List(Of Threading.Thread)
                 Dim mFilesThreads As New Queue(Of String)
@@ -307,60 +311,62 @@ Public Class FormMain
                 mThreadInfo("TotalSpace") = 0
                 mThreadInfo("JpgSpace") = 0
 
-                g_fFormMain.BeginInvoke(Sub() g_fFormMain.ToolStripProgressBar_Progress.Maximum = sFiles.Length)
+                If (sFiles.Length > 0) Then
+                    g_fFormMain.BeginInvoke(Sub() g_fFormMain.ToolStripProgressBar_Progress.Maximum = sFiles.Length)
 
+                    For i = 0 To sFiles.Length - 1
+                        mFilesThreads.Enqueue(sFiles(i))
+                    Next
 
-                For i = 0 To sFiles.Length - 1
-                    mFilesThreads.Enqueue(sFiles(i))
-                Next
+                    For i = 0 To iThreads
+                        Dim mData As New Dictionary(Of String, Object)
+                        mData("FilesThreads") = mFilesThreads
+                        mData("PngInfo") = mPngInfo
+                        mData("Quality") = iQuality
+                        mData("ThreadInfo") = mThreadInfo
 
-                For i = 0 To iThreads
-                    Dim mData As New Dictionary(Of String, Object)
-                    mData("FilesThreads") = mFilesThreads
-                    mData("PngInfo") = mPngInfo
-                    mData("Quality") = iQuality
-                    mData("ThreadInfo") = mThreadInfo
+                        Dim tThread As New Threading.Thread(AddressOf SubScanner) With {
+                            .IsBackground = True
+                        }
+                        tThread.Start(mData)
 
-                    Dim tThread As New Threading.Thread(AddressOf SubScanner) With {
-                        .IsBackground = True
-                    }
-                    tThread.Start(mData)
+                        mThreads.Add(tThread)
+                    Next
 
-                    mThreads.Add(tThread)
-                Next
+                    Try
+                        While True
+                            Threading.Thread.Sleep(1000)
 
-                Try
-                    While True
-                        Threading.Thread.Sleep(1000)
+                            Dim iFiles As Integer
 
-                        Dim iFiles As Integer
+                            SyncLock _lock
+                                iFiles = CInt(mThreadInfo("Files"))
+                            End SyncLock
 
-                        SyncLock _lock
-                            iFiles = CInt(mThreadInfo("Files"))
-                        End SyncLock
+                            g_fFormMain.BeginInvoke(Sub() g_fFormMain.ToolStripProgressBar_Progress.Value = iFiles)
+                            g_fFormMain.BeginInvoke(Sub() g_fFormMain.ToolStripStatusLabel_Progress.Text = String.Format("Analyzing files {0}/{1} {2}%...", iFiles, sFiles.Length, CInt(Math.Ceiling(iFiles / sFiles.Length * 100))))
 
-                        g_fFormMain.BeginInvoke(Sub() g_fFormMain.ToolStripProgressBar_Progress.Value = iFiles)
-                        g_fFormMain.BeginInvoke(Sub() g_fFormMain.ToolStripStatusLabel_Progress.Text = String.Format("Analyzing files {0}/{1} {2}%...", iFiles, sFiles.Length, CInt(Math.Ceiling(iFiles / sFiles.Length * 100))))
+                            For Each mThread In mThreads
+                                If (mThread.IsAlive) Then
+                                    Continue While
+                                End If
+                            Next
 
+                            Exit While
+                        End While
+                    Catch ex As Threading.ThreadAbortException
                         For Each mThread In mThreads
-                            If (mThread.IsAlive) Then
-                                Continue While
-                            End If
+                            mThread.Abort()
                         Next
 
-                        Exit While
-                    End While
-                Catch ex As Threading.ThreadAbortException
-                    For Each mThread In mThreads
-                        mThread.Abort()
-                    Next
+                        For Each mThread In mThreads
+                            mThread.Join()
+                        Next
 
-                    For Each mThread In mThreads
-                        mThread.Join()
-                    Next
+                        Throw
+                    End Try
+                End If
 
-                    Throw
-                End Try
 
                 Dim iTotalSpace As Long = CLng(mThreadInfo("TotalSpace"))
                 Dim iJpgSpace As Long = CLng(mThreadInfo("JpgSpace"))
@@ -455,7 +461,12 @@ Public Class FormMain
         ReadOnly Property m_ImageInfo As STRUC_IMAGE_INFO
 
         Public Sub New(_ImageInfo As STRUC_IMAGE_INFO)
-            MyBase.New(New String() {CStr(Math.Ceiling(_ImageInfo.iRatio * 100)), _ImageInfo.sFile, ClassHelpers.FormatBytes(_ImageInfo.iSize), ClassHelpers.FormatBytes(_ImageInfo.m_RatioSize), CStr(_ImageInfo.iQuality)})
+            MyBase.New(New String() {
+                       _ImageInfo.sFile,
+                       CStr(Math.Ceiling(_ImageInfo.iRatio * 100)),
+                       ClassHelpers.FormatBytes(_ImageInfo.iSize),
+                       ClassHelpers.FormatBytes(_ImageInfo.m_RatioSize),
+                       CStr(_ImageInfo.iQuality)})
 
             m_ImageInfo = _ImageInfo
         End Sub
